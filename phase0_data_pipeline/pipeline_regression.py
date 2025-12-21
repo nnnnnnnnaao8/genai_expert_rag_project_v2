@@ -26,13 +26,13 @@ def build_regression_pipeline(
         ]
     )
 
-    categorical_transformer = Pipeline(
+    categorical_transformer = Pipeline(  
         steps=[
             ("encoder", OneHotEncoder(handle_unknown="ignore")),
         ]
     )
 
-    preprocessor = ColumnTransformer(
+    preprocessor = ColumnTransformer(  #?
         transformers=[
             ("num", numeric_transformer, numeric_features),
             ("cat", categorical_transformer, categorical_features),
@@ -66,8 +66,8 @@ def train_and_eval(
     - RMSE/MAE を出力
     """
     df = load_raw_csv(filename)
-    df = basic_clean(df)
-    X, y = split_features_target(df, target_col)
+    df = basic_clean(df)   #?
+    X, y = split_features_target(df, target_col) #target_col(目的変数の列)をyにする　それ以外をX(特徴量)にする
 
     numeric_features = X.select_dtypes(include=[np.number]).columns.tolist()
     categorical_features = [c for c in X.columns if c not in numeric_features]
