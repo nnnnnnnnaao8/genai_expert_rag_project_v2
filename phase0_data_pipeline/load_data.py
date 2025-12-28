@@ -3,9 +3,7 @@
 # 主に CSV 読み込み、簡易クリーニング、特徴量と目的変数の分割を行います。
 
 from typing import Tuple
-
 import pandas as pd
-
 from config import RAW_DATA_DIR, PROCESSED_DATA_DIR
 
 
