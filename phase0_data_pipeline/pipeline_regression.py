@@ -1,6 +1,8 @@
 # このファイルは、回帰タスク向けの機械学習パイプライン（前処理→学習→評価）を構築するためのものです。
 # 学習済みエンジニアとして「前処理と分析パイプラインを設計できる」ことを証明する用途を想定しています。
 
+
+
 from typing import Tuple
 
 import numpy as np
@@ -12,7 +14,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from .load_data import basic_clean, load_raw_csv, split_features_target
-
+#from phase0_data_pipeline.load_data import basic_clean, load_raw_csv, split_features_target
 
 def build_regression_pipeline(
     numeric_features, categorical_features
@@ -54,7 +56,7 @@ def train_and_eval(
     filename: str,
     target_col: str,
     test_size: float = 0.2,
-    random_state: int = 42,
+    random_state: int = 42,#random_state（乱数の種：ランダムの固定値）を固定すると分割結果が毎回同じになるため指定 
 ) -> None:
     """
     一連の流れ：
@@ -87,7 +89,11 @@ def train_and_eval(
     print(f"MAE : {mae:.3f}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":#このファイルを「直接実行したときだけ」動く
+    # ∟ import（読み込み）された時は動かない
+    # ∟ スト実行・単体実行に便利
+
     # 実際の使い方：
     # data/raw/sample_regression.csv を置き、目的変数名を指定する
     train_and_eval(filename="sample_regression.csv", target_col="target")
+    #sample_regression.csv sample_regression_income_as_text
