@@ -7,8 +7,9 @@ from typing import List, Tuple
 import csv
 
 from config import QA_PAIRS_DIR
-from evalsuite.metrics import exact_match, simple_f1
+from evalsuite.metrics import exact_match, simple_f1 
 from phase2_rag_core.rag_baseline import answer
+from evalsuite.metrics import exact_match, char_ngram_f1#n-gram追加
 
 
 QA_FILE = QA_PAIRS_DIR / "sample_qa.csv"
@@ -18,7 +19,7 @@ def load_qa_pairs(path: Path) -> List[Tuple[str, str]]:
     pairs: List[Tuple[str, str]] = []
     if not path.exists():
         raise FileNotFoundError(f"QAファイルが見つかりません: {path}")
-    with path.open(encoding="utf-8") as f:
+    with path.open(encoding="utf-8-sig") as f: #BOM（ビーオーエム：文字コード先頭の目印）付きUTF-8を自動で除去して読んでくれる
         reader = csv.DictReader(f)
         for row in reader:
             pairs.append((row["question"], row["answer"]))
@@ -35,7 +36,9 @@ def main():
     for q, gold in qa_pairs:
         pred, meta = answer(q, k=5)
         em = exact_match(pred, gold)
-        f1 = simple_f1(pred, gold)
+        #f1 = simple_f1(pred, gold) 旧
+        f1 = char_ngram_f1(pred, gold, n=2) #n-gram用計算
+
         em_sum += em
         f1_sum += f1
 

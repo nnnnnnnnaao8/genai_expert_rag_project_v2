@@ -1,5 +1,6 @@
 # このファイルは、最小構成のRAG検索＋回答生成ロジックを提供するためのものです。
 # eval_rag や エージェントのツールから利用され、「RAGのベースライン実装」として機能します。
+#　 質問(クエリ)に対する回答をindexから探索したうえで、生成します
 
 
 # ★開発用（対話型ウィンドウでも動かすためのおまじない）
@@ -24,6 +25,14 @@ from .rag_config import (
 def get_collection():
     """
     Chroma のコレクションを取得する。
+     Chroma（クロマ：ベクトルDBライブラリ）は文章のembedding（埋め込みベクトル）を保存して、近いものを検索できるDB。
+     collection（コレクション：DB内の“箱”）って何？
+     →Chromaの中で「docs」みたいなデータのまとまり（名前付きの入れ物）。
+      あなたのコードだと name="docs" がそれ。
+
+    いつ出てくる？
+    1.build_index() のとき：get_or_create_collection("docs") → 登録する箱を用意
+    2.retrieve() のとき：同じ "docs" を取得 → 検索する
     """
     db = chromadb.PersistentClient(path=str(RAG_INDEX_DIR))
     collection = db.get_or_create_collection(
@@ -48,7 +57,7 @@ def retrieve(query: str, k: int = DEFAULT_TOP_K):
 
 def build_prompt(query: str, contexts) -> str:
     """
-    コンテキストと質問から、LLMに渡すプロンプトを組み立てる。
+    コンテキストと質問から、LLMに渡すプロンプトを組み立てる。(RAGでいうコンテキストはベクトルDBから拾ってきたチャンクのこと)
     """
     context_text = "\n\n".join(
         [f"[{i}] {c[0]}" for i, c in enumerate(contexts)]
@@ -71,6 +80,7 @@ def build_prompt(query: str, contexts) -> str:
 def answer(query: str, k: int = DEFAULT_TOP_K) -> tuple[str, dict]:
     """
     質問に対してRAGで回答を生成し、テキストとメタ情報を返す。
+    メタ情報とは、ページ数とか、文書名とか
     """
     contexts = retrieve(query, k=k)
     prompt = build_prompt(query, contexts)
